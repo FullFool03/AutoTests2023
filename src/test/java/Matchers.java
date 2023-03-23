@@ -46,10 +46,10 @@ public class Matchers {
     @Test
     public void wrongLogIn() throws InterruptedException {
         MainPage page = new MainPage(BASE_URL);
-        page.login(WRONG_LOGIN, WRONG_PASSWORD);
-        String str = "Неправильно указан логин и/или пароль";
-        assertThat(page.getWrongLoginFiled().innerText(),equalTo(str));
-        page.getWrongLoginFiled().shouldHave(Condition.text("Неправильно указан логин и/или пароль"));
+        page.qrEnter().click();
+        page.getQrText().shouldBe(Condition.visible);
+        String str = "Получите код для быстрого входа в ОК:";
+        assertThat(page.getQrText().innerText(),equalTo(str));
         Thread.sleep(1000);
     }
 }
