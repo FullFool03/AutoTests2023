@@ -1,3 +1,6 @@
+import Pages.BasePage;
+import Pages.LoginPage;
+import Utils.User;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -8,7 +11,12 @@ import org.junit.jupiter.api.BeforeEach;
 
 import static com.codeborne.selenide.Selenide.$;
 
-public abstract class BaseTest extends LoadableComponent {
+public abstract class BaseTest {
+
+    protected LoginPage loginPage;
+    protected final static String RIGHT_LOGIN = "botS23AT18";
+    protected final static String RIGHT_PASSWORD = "autotests2023";
+
     public static void setUp() {
         WebDriverManager.chromedriver().setup();
         Configuration.browser = "chrome";
@@ -16,23 +24,15 @@ public abstract class BaseTest extends LoadableComponent {
         Configuration.browserSize = "3440x1440";
         Configuration.headless = false;
     }
-    @BeforeAll
-    public static void Config() {
-        Configuration.browser = "chrome";
-    }
 
     @BeforeEach
     public void init() {
         setUp();
+        loginPage = new LoginPage();
     }
 
     @AfterEach
     public void tearDown() {
-        Selenide.closeWebDriver();
-    }
-
-    @AfterAll
-    static void close() {
         Selenide.closeWebDriver();
     }
 }

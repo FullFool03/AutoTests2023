@@ -1,3 +1,5 @@
+package Utils;
+
 public class User {
     private final String email;
     private final String password;

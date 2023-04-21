@@ -1,3 +1,6 @@
+import Pages.BasePage;
+import Pages.LoginPage;
+import Utils.User;
 import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -5,54 +8,46 @@ import org.openqa.selenium.By;
 import static com.codeborne.selenide.Selectors.byXpath;
 import static com.codeborne.selenide.Selenide.webdriver;
 import static com.codeborne.selenide.WebDriverConditions.url;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class LoginTests extends BaseTest {
-
-    private final static String BASE_URL = "https://ok.ru";
     private final static String WRONG_LOGIN = "123";
-    private final static String RIGHT_LOGIN = "botS23AT18";
     private final static String WRONG_PASSWORD = "123";
-    private final static String RIGHT_PASSWORD = "autotests2023";
-    private final static String NO_EMAIL = "https://ok.ru/dk?st.cmd=anonymMain&st.error=errors.email.empty";
-    private static By element = byXpath("//input[@name='st.email']");
-    private final static User user = new User(RIGHT_LOGIN, RIGHT_PASSWORD);
-    private final static User wrongUser = new User(WRONG_LOGIN, WRONG_PASSWORD);
 
-    //Chain of invocations
+    private static By element = byXpath("//input[@name='st.email']");
+    private final static String NO_EMAIL_URL = "https://ok.ru/dk?st.cmd=anonymMain&st.error=errors.email.empty";
+
+//    private final static User WRONG_USER = new User(WRONG_LOGIN, WRONG_PASSWORD);
+    private final static String LOGIN_ERR = "Неправильно указан логин и/или пароль";
+
+    private final static String QR_TEXT ="Получите код для быстрого входа в ОК:";
+
+    public static final String LOGIN_MISSING = "Введите логин";
+
     @Test
     public void rightLogIn() {
-        MainPage page = new MainPage(BASE_URL, element);
-        page
-                .setEmailField(user)
-                .setPasswordField(user)
-                .pressEnter();
-        page.getMainPage().shouldBe(Condition.visible);
+        assertNotNull(loginPage.login(RIGHT_LOGIN,RIGHT_PASSWORD));
     }
 
     @Test
     public void wrongLogIn() {
-        MainPage page = new MainPage(BASE_URL);
-        page
-                .setEmailField(wrongUser)
-                .setPasswordField(wrongUser)
-                .pressEnter();
-        page.getWrongLoginFiled().shouldHave(Condition.text("Неправильно указан логин и/или пароль"));
+        loginPage.login(WRONG_LOGIN,RIGHT_PASSWORD);
+        assertThat(loginPage.getWrongLoginFiled().text(), containsString(LOGIN_ERR));
     }
 
     @Test
     public void noUsername() {
-        MainPage page = new MainPage(BASE_URL);
-        page
-                .setPasswordField(wrongUser)
-                .pressEnter();
-        webdriver().shouldHave(url(NO_EMAIL));
-        page.getWrongLoginFiled().shouldHave(Condition.text("Введите логин"));
+        loginPage.login("",RIGHT_PASSWORD);
+        webdriver().shouldHave(url(NO_EMAIL_URL));
+        assertThat(loginPage.getWrongLoginFiled().text(), containsString(LOGIN_MISSING));
     }
 
     @Test
     public void qrLogIn() {
-        MainPage page = new MainPage(BASE_URL);
-        page.qrEnter().click();
-        page.getQrText().shouldBe(Condition.visible);
+        loginPage.qrEnter().click();
+        assertThat(loginPage.getQR_TEXT().text(), containsString(QR_TEXT));
     }
+
 }
